@@ -1,3 +1,5 @@
+import 'package:calculations/domain/Calculations.dart';
+import 'package:calculations/domain/operation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -24,7 +26,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String? dropdownValue;
+  Operation? dropdownValue;
   double? num1;
   double? num2;
   double? result;
@@ -59,18 +61,17 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       VerticalDivider(),
-                      DropdownButton<String>(
+                      DropdownButton<Operation>(
                         value: dropdownValue,
-                        items: ["+", "-"]
+                        items: Calculations.getOperations()
                             .map((value) => DropdownMenuItem(
                                   value: value,
-                                  child: Text(value),
+                                  child: Text(value.shortName()),
                                 ))
                             .toList(),
-                        onChanged: (String? newValue) {
+                        onChanged: (Operation? newValue) {
                           setState(() {
                             dropdownValue = newValue;
-                            print(dropdownValue);
                           });
                         },
                       ),
@@ -109,10 +110,8 @@ class _MyHomePageState extends State<MyHomePage> {
             child: ElevatedButton(
               onPressed: () {
                 setState(() {
-                  if (dropdownValue == "+") {
-                    result = (num1 ?? 0) + (num2 ?? 0);
-                  } else if (dropdownValue == "-") {
-                    result = (num1 ?? 0) - (num2 ?? 0);
+                  if (dropdownValue != null) {
+                    result = dropdownValue!.operation(num1, num2);
                   }
                 });
               },
