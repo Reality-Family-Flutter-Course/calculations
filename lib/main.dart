@@ -1,5 +1,6 @@
 import 'package:calculations/domain/Calculations.dart';
 import 'package:calculations/domain/operation.dart';
+import 'package:calculations/presentation/Factories/Controller.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -27,8 +28,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Operation? dropdownValue;
-  double? num1;
-  double? num2;
+  TextEditingController num1 = TextEditingController();
+  TextEditingController num2 = TextEditingController();
   double? result;
 
   @override
@@ -49,44 +50,26 @@ class _MyHomePageState extends State<MyHomePage> {
                   Row(
                     children: [
                       Flexible(
-                        child: TextField(
-                          decoration: InputDecoration(hintText: "Первое число"),
-                          keyboardType: TextInputType.numberWithOptions(
-                            signed: false,
-                            decimal: true,
-                          ),
-                          onChanged: (String value) {
-                            num1 = double.tryParse(value);
-                          },
+                        child: UIController.getFabric()!.getTextField(
+                          controller: num1,
+                          hintText: "Первое число",
                         ),
                       ),
                       VerticalDivider(),
-                      DropdownButton<Operation>(
-                        value: dropdownValue,
+                      UIController.getFabric()!.getDropdown<Operation>(
                         items: Calculations.getOperations()
                             .map((value) => DropdownMenuItem(
                                   value: value,
                                   child: Text(value.shortName()),
                                 ))
                             .toList(),
-                        onChanged: (Operation? newValue) {
-                          setState(() {
-                            dropdownValue = newValue;
-                          });
-                        },
+                        callBack: (value) => dropdownValue = value,
                       ),
                       VerticalDivider(),
                       Flexible(
-                        child: TextField(
-                          autofocus: true,
-                          decoration: InputDecoration(hintText: "Второе число"),
-                          keyboardType: TextInputType.numberWithOptions(
-                            signed: false,
-                            decimal: true,
-                          ),
-                          onChanged: (String value) {
-                            num2 = double.tryParse(value);
-                          },
+                        child: UIController.getFabric()!.getTextField(
+                          controller: num2,
+                          hintText: "Второе число",
                         ),
                       ),
                     ],
@@ -105,18 +88,18 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 15),
-            child: ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  if (dropdownValue != null) {
-                    result = dropdownValue!.operation(num1, num2);
-                  }
-                });
-              },
-              child: Text("Произвести операцию"),
-            ),
+          UIController.getFabric()!.getButton(
+            title: "Произвести операцию",
+            callBack: () {
+              setState(() {
+                if (dropdownValue != null) {
+                  result = dropdownValue!.operation(
+                    double.tryParse(num1.text),
+                    double.tryParse(num2.text),
+                  );
+                }
+              });
+            },
           ),
         ],
       ),
